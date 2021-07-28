@@ -74,18 +74,11 @@ func PatchProtoReflect(path string) error {
 		}
 	}
 
-	var buf bytes.Buffer
-	err = printer.Fprint(&buf, fset, f)
-	if err != nil {
-		return err
-	}
-
+	buf := getBytesFromFile(fset, f)
 	err = os.Remove(path)
 	if err != nil {
 		return err
 	}
-
-
 	err = os.WriteFile(path, buf.Bytes(), 0776)
 	if err != nil {
 		return err
@@ -125,7 +118,13 @@ func Patch(src string, paths... string) (*ast.File, *token.FileSet, error) {
 		}
 
 		srcF.Decls = mergedDecls
+		os.Remove(path)
 	}
+
+	os.Remove(src)
+	bz := getBytesFromFile(srcFset, srcF)
+	os.WriteFile(src, bz.Bytes(), 0766)
+
 	return  srcF,srcFset, nil
 }
 
