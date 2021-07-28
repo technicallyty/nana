@@ -4,7 +4,7 @@
 // 	protoc        v3.13.0
 // source: foo.proto
 
-package main
+package testdata
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -41,7 +41,7 @@ func (x *Bar) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Bar) ProtoMessage()	{}
+func (*Bar) ProtoMessage() {}
 
 func (x *Bar) ProtoReflect() protoreflect.Message {
 
@@ -83,7 +83,7 @@ func (x *Hello) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Hello) ProtoMessage()	{}
+func (*Hello) ProtoMessage() {}
 
 func (x *Hello) ProtoReflect() protoreflect.Message {
 
@@ -139,8 +139,8 @@ func file_foo_proto_rawDescGZIP() []byte {
 
 var file_foo_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_foo_proto_goTypes = []interface{}{
-	(*Bar)(nil),	// 0: cosmos.proto.Bar
-	(*Hello)(nil),	// 1: cosmos.proto.Hello
+	(*Bar)(nil),   // 0: cosmos.proto.Bar
+	(*Hello)(nil), // 1: cosmos.proto.Hello
 }
 var file_foo_proto_depIdxs = []int32{
 	0,	// [0:0] is the sub-list for method output_type
@@ -184,16 +184,16 @@ func file_foo_proto_init() {
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
-			GoPackagePath:	reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor:	file_foo_proto_rawDesc,
-			NumEnums:	0,
-			NumMessages:	2,
-			NumExtensions:	0,
-			NumServices:	0,
+			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
+			RawDescriptor: file_foo_proto_rawDesc,
+			NumEnums:      0,
+			NumMessages:   2,
+			NumExtensions: 0,
+			NumServices:   0,
 		},
-		GoTypes:		file_foo_proto_goTypes,
-		DependencyIndexes:	file_foo_proto_depIdxs,
-		MessageInfos:		file_foo_proto_msgTypes,
+		GoTypes:           file_foo_proto_goTypes,
+		DependencyIndexes: file_foo_proto_depIdxs,
+		MessageInfos:      file_foo_proto_msgTypes,
 	}.Build()
 	File_foo_proto = out.File
 	file_foo_proto_rawDesc = nil

@@ -11,30 +11,6 @@ import (
 	"os"
 )
 
-func main() {
-	//err := RewriteFile("bar.pb.go")
-	//if err != nil {
-	//	panic(err)
-	//}
-	f, fset, err := Patch("bar.pb.go","foo.go", "bar.go")
-	if err != nil {
-		panic(err)
-	}
-
-	bytes := getBytesFromFile(fset, f)
-	// fmt.Println(bytes.String())
-	os.WriteFile("merged.go", bytes.Bytes(), 0766)
-}
-
-func getBytesFromFile(set *token.FileSet, file *ast.File) *bytes.Buffer {
-	var buf bytes.Buffer
-	err := printer.Fprint(&buf, set, file)
-	if err != nil {
-		panic(err)
-	}
-	return &buf
-}
-
 func PatchProtoReflect(path string) error {
 	fset := token.NewFileSet()
 	f, err := parser.ParseFile(fset, path, nil, parser.ParseComments)
@@ -169,4 +145,13 @@ func patchDecls(src, dst []ast.Decl) ([]ast.Decl, error) {
 	src = append(src, dst...)
 
 	return src, nil
+}
+
+func getBytesFromFile(set *token.FileSet, file *ast.File) *bytes.Buffer {
+	var buf bytes.Buffer
+	err := printer.Fprint(&buf, set, file)
+	if err != nil {
+		panic(err)
+	}
+	return &buf
 }
