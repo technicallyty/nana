@@ -11,7 +11,9 @@ import (
 	"os"
 )
 
-func main(){}
+func main(){
+	fmt.Println("test")
+}
 
 func PatchProtoReflect(path string) error {
 	fset := token.NewFileSet()
