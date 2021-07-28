@@ -1,4 +1,4 @@
-package nana
+package main
 
 import (
 	"bytes"
@@ -10,6 +10,8 @@ import (
 	"go/token"
 	"os"
 )
+
+func main(){}
 
 func PatchProtoReflect(path string) error {
 	fset := token.NewFileSet()
