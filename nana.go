@@ -11,6 +11,8 @@ import (
 	"os"
 )
 
+func main(){}
+
 func PatchProtoReflect(path string) error {
 	fset := token.NewFileSet()
 	f, err := parser.ParseFile(fset, path, nil, parser.ParseComments)
