@@ -1,0 +1,7 @@
+syntax="proto3";
+
+option go_package = "github.com/technicallyty/yolo/testdata";
+
+message Foo {
+  string bar = 1;
+}

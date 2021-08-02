@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"errors"
+	"flag"
 	"fmt"
 	"go/ast"
 	"go/parser"
@@ -11,45 +12,65 @@ import (
 	"os"
 )
 
-func main(){
-	fmt.Println("test")
+func main() {
+	patcher := flag.NewFlagSet("delete", flag.ExitOnError)
+	funcName := patcher.String("func", "", "function to patch -- example: -func nameOfFunc")
+	fileName := patcher.String("file", "", "the path to the file to delete -- example: -file path/to/file")
+	if len(os.Args) < 3 {
+		fmt.Println("not enough arguments passed")
+		os.Exit(51)
+	}
+	if os.Args[1] != "delete" {
+		fmt.Sprintf("command '%s' not recognized", os.Args[1])
+		os.Exit(50)
+	}
+	patcher.Parse(os.Args[2:])
+	err := RemoveFunction(*fileName, *funcName)
+	if err != nil {
+		panic(err)
+	}
 }
 
-func PatchProtoReflect(path string) error {
+func RemoveFunction(path, function string) error {
 	fset := token.NewFileSet()
 	f, err := parser.ParseFile(fset, path, nil, parser.ParseComments)
 	if err != nil {
 		return err
 	}
 
-	for _,v := range f.Decls {
+	for i,v := range f.Decls {
 		switch t := v.(type) {
 		case *ast.FuncDecl:
-			if t.Name.String() == "ProtoReflect" {
-
-				if len(t.Recv.List) < 1 {
-					return errors.New("expected receiver on ProtoReflect Method")
+			if t.Name.String() == function {
+				// delete all protoreflect methods so we can make our own
+				if i != len(f.Decls)-1 {
+					f.Decls[i] = f.Decls[len(f.Decls)-1]
 				}
-				if len(t.Recv.List[0].Names) < 1 {
-					return errors.New("expected receiver on ProtoReflect Method")
-				}
-
-				rewrite := t.Recv.List[0].Names[0].Name
-				exp, err := parser.ParseExpr(rewrite)
-				if err != nil {
-					return err
-				}
-
-				returnThis := ast.ReturnStmt{
-					Return:  t.Body.List[len(t.Body.List)-1].Pos(),
-					Results: []ast.Expr{exp},
-				}
-				block := ast.BlockStmt{
-					Lbrace: t.Body.Lbrace,
-					List:   []ast.Stmt{&returnThis},
-					Rbrace: t.Body.Rbrace,
-				}
-				t.Body = &block
+				// drop the last element
+				f.Decls =  f.Decls[:len(f.Decls)-1]
+				//if len(t.Recv.List) < 1 {
+				//	return errors.New("expected receiver on ProtoReflect Method")
+				//}
+				//if len(t.Recv.List[0].Names) < 1 {
+				//	return errors.New("expected receiver on ProtoReflect Method")
+				//}
+				//
+				//rewrite := t.Recv.List[0].Names[0].Name
+				//exp, err := parser.ParseExpr(rewrite)
+				//if err != nil {
+				//	return err
+				//}
+				//
+				//returnThis := ast.ReturnStmt{
+				//	Return:  t.Body.List[len(t.Body.List)-1].Pos(),
+				//	Results: []ast.Expr{exp},
+				//}
+				//block := ast.BlockStmt{
+				//	Lbrace: t.Body.Lbrace,
+				//	List:   []ast.Stmt{&returnThis},
+				//	Rbrace: t.Body.Rbrace,
+				//}
+				//t.Body = &block
 			}
 		}
 	}
