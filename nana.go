@@ -13,19 +13,57 @@ import (
 )
 
 func main() {
-	patcher := flag.NewFlagSet("delete", flag.ExitOnError)
-	funcName := patcher.String("func", "", "function to patch -- example: -func nameOfFunc")
-	fileName := patcher.String("file", "", "the path to the file to delete -- example: -file path/to/file")
+
+	var fNames string
+	patcher := flag.NewFlagSet("sew", flag.ExitOnError)
+	saveAs := patcher.String("saveAs", "patched.go", "the file to write to disk")
+	patcher.StringVar(&fNames,"files", "", "the files to sew together")
+	remove := patcher.Bool("D", false, "delete files after patching")
+
+	deleter := flag.NewFlagSet("delete", flag.ExitOnError)
+	funcName := deleter.String("func", "", "function to patch -- example: -func nameOfFunc")
+	fileName := deleter.String("file", "", "the path to the file to delete -- example: -file path/to/file")
+
 	if len(os.Args) < 3 {
 		fmt.Println("not enough arguments passed")
 		os.Exit(51)
 	}
-	if os.Args[1] != "delete" {
-		fmt.Sprintf("command '%s' not recognized", os.Args[1])
-		os.Exit(50)
+
+	if os.Args[1] == "delete" {
+		deleter.Parse(os.Args[2:])
+		delete(*fileName, *funcName)
+	} else if os.Args[1] == "sew" {
+		patcher.Parse(os.Args[2:])
+		args := patcher.Args()
+		fmt.Println(*saveAs)
+		fmt.Println(args)
+		patch(*saveAs, *remove, args...)
 	}
-	patcher.Parse(os.Args[2:])
-	err := RemoveFunction(*fileName, *funcName)
+
+	fmt.Printf("command '%s' not recognized", os.Args[1])
+	os.Exit(50)
+
+}
+
+func patch(saveAs string, deleteFiles bool, files... string) {
+	if len(files) < 1 {
+		panic("patch requires at least 2 files to merge")
+	}
+	file, fset, err := Patch(files[0], files[1:]...)
+	if err != nil {
+		panic(err)
+	}
+	bz := getBytesFromFile(fset, file)
+	os.WriteFile(saveAs, bz.Bytes(), 0766)
+	if deleteFiles {
+		for _, f := range files {
+			os.Remove(f)
+		}
+	}
+}
+
+func delete(funcName, fileName string) {
+	err := RemoveFunction(fileName, funcName)
 	if err != nil {
 		panic(err)
 	}
@@ -119,12 +157,11 @@ func Patch(src string, paths... string) (*ast.File, *token.FileSet, error) {
 		}
 
 		srcF.Decls = mergedDecls
-		os.Remove(path)
 	}
-
-	os.Remove(src)
-	bz := getBytesFromFile(srcFset, srcF)
-	os.WriteFile(src, bz.Bytes(), 0766)
+	//
+	//os.Remove(src)
+	//bz := getBytesFromFile(srcFset, srcF)
+	//os.WriteFile(src, bz.Bytes(), 0766)
 
 	return  srcF,srcFset, nil
 }
