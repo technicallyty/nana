@@ -158,10 +158,6 @@ func Patch(src string, paths... string) (*ast.File, *token.FileSet, error) {
 
 		srcF.Decls = mergedDecls
 	}
-	//
-	//os.Remove(src)
-	//bz := getBytesFromFile(srcFset, srcF)
-	//os.WriteFile(src, bz.Bytes(), 0766)
 
 	return  srcF,srcFset, nil
 }
